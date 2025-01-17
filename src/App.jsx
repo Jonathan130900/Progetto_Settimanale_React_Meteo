@@ -1,11 +1,11 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import Weather from "./components/Weather";
+import "./App.css";
 
 function App() {
   return (
-    <div className="d-flex justify-content-center align-items-center min-vh-100">
-      <div className="w-100 text-center">
-        {" "}
+    <div className="app-container">
+      <div>
         <Weather />
       </div>
     </div>

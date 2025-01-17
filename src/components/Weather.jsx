@@ -3,13 +3,13 @@ import { useState, useEffect } from "react";
 const Weather = () => {
   const [city, setCity] = useState("");
   const [currentWeatherData, setCurrentWeatherData] = useState(null);
-  // eslint-disable-next-line no-unused-vars
   const [searchedWeatherData, setSearchedWeatherData] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [coords, setCoords] = useState(null);
   const [searchHistory, setSearchHistory] = useState([]);
   const [currentSearch, setCurrentSearch] = useState(null);
+  const [showCurrentWeather, setShowCurrentWeather] = useState(true);
 
   const apiKey = "f2766217a1ae64c550b2aa0c248f7cee";
 
@@ -27,7 +27,7 @@ const Weather = () => {
 
   const fetchCityImage = async (cityName) => {
     const pexelsApiKey =
-      "817K1EidcxG2v1sZ67LKXDvynIsFoB2jV0Vr0wzIEt04qtpuMs9oSPAd"; // Replace with your API key
+      "817K1EidcxG2v1sZ67LKXDvynIsFoB2jV0Vr0wzIEt04qtpuMs9oSPAd";
     const apiUrl = `https://api.pexels.com/v1/search?query=${cityName}&per_page=1`;
 
     try {
@@ -165,6 +165,7 @@ const Weather = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     if (city) {
+      setShowCurrentWeather(false);
       fetchWeatherByCity(city);
       setCity("");
     }
@@ -177,12 +178,25 @@ const Weather = () => {
         minHeight: "100vh",
         textAlign: "center",
         padding: "0 15px",
+        position: "relative",
       }}
     >
-      <h1 className="mb-4">App Meteo</h1>
+      <h1
+        className="fixed-top d-flex align-items-start mb-6"
+        style={{
+          fontWeight: "bold",
+          fontSize: "48px",
+          width: "100%",
+          padding: "15px 0",
+          zIndex: "10",
+          marginLeft: "10px",
+        }}
+      >
+        Il Meteo
+      </h1>
       <form
         onSubmit={handleSubmit}
-        className="mb-4 w-100"
+        className="mb-4 mt-5 w-100"
         style={{
           maxWidth: "500px",
           width: "100%",
@@ -203,12 +217,13 @@ const Weather = () => {
         <div className="alert alert-info">Caricamento in corso...</div>
       )}
       {error && <div className="alert alert-danger">{error}</div>}
-      {currentWeatherData && (
+
+      {showCurrentWeather && currentWeatherData && (
         <div
           className="card mt-4"
           style={{
             width: "100%",
-            maxWidth: "600px",
+            maxWidth: "800px",
             padding: "2rem",
             background: currentWeatherData.backgroundImage
               ? `linear-gradient(rgba(0, 0, 0, 0), rgba(119, 125, 185, 0.55)), url(${currentWeatherData.backgroundImage})`
@@ -221,28 +236,20 @@ const Weather = () => {
               : "none",
           }}
         >
-          <div className="card-body d-flex justify-content-between">
-            <div
-              className="d-flex flex-row align-items-center justify-content-center"
-              style={{ marginRight: "20px", width: "auto" }}
-            >
+          <div className="d-flex justify-content-between">
+            <div className="d-flex flex-row align-items-center">
               <img
                 src={currentWeatherData.iconUrl}
                 alt={currentWeatherData.description}
-                style={{
-                  width: "70px",
-                  height: "70px",
-                  marginRight: "15px",
-                }}
+                style={{ width: "70px", height: "70px", marginRight: "15px" }}
               />
               <h4
                 className="card-title mt-2"
-                style={{ textTransform: "uppercase", fontSize: "1.8rem" }}
+                style={{ textTransform: "uppercase", fontSize: "2rem" }}
               >
                 {currentWeatherData.name}
               </h4>
             </div>
-
             <div>
               <p className="card-text" style={{ fontSize: "1.5rem" }}>
                 Temperatura:{" "}
@@ -268,6 +275,99 @@ const Weather = () => {
           </div>
         </div>
       )}
+
+      {showCurrentWeather === false && currentWeatherData && (
+        <div
+          className="card position-fixed"
+          style={{
+            top: "20px",
+            right: "20px",
+            width: "250px",
+            padding: "1.2rem",
+            background: currentWeatherData.backgroundImage
+              ? `linear-gradient(rgba(0, 0, 0, 0), rgba(119, 125, 185, 0.55)), url(${currentWeatherData.backgroundImage})`
+              : "white",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            color: currentWeatherData.backgroundImage ? "white" : "black",
+            textShadow: currentWeatherData.backgroundImage
+              ? "0 1px 3px rgba(0, 0, 0, 0.8)"
+              : "none",
+            zIndex: "9999",
+          }}
+        >
+          <div className="d-flex flex-column align-items-center">
+            <img
+              src={currentWeatherData.iconUrl}
+              alt={currentWeatherData.description}
+              style={{ width: "40px", height: "40px", marginBottom: "10px" }}
+            />
+            <h6 style={{ fontSize: "1rem" }}>{currentWeatherData.name}</h6>
+            <p style={{ fontSize: "1rem" }}>
+              {currentWeatherData.temperature}°C
+            </p>
+          </div>
+        </div>
+      )}
+
+      {searchedWeatherData && (
+        <div
+          className="card mt-4"
+          style={{
+            width: "100%",
+            maxWidth: "800px",
+            padding: "2rem",
+            background: searchedWeatherData.backgroundImage
+              ? `linear-gradient(rgba(0, 0, 0, 0), rgba(119, 125, 185, 0.55)), url(${searchedWeatherData.backgroundImage})`
+              : "white",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            color: searchedWeatherData.backgroundImage ? "white" : "black",
+            textShadow: searchedWeatherData.backgroundImage
+              ? "0 1px 3px rgba(0, 0, 0, 0.8)"
+              : "none",
+          }}
+        >
+          <div className="d-flex justify-content-between">
+            <div className="d-flex flex-row align-items-center">
+              <img
+                src={searchedWeatherData.iconUrl}
+                alt={searchedWeatherData.description}
+                style={{ width: "70px", height: "70px", marginRight: "15px" }}
+              />
+              <h4
+                className="card-title mt-2"
+                style={{ textTransform: "uppercase", fontSize: "2rem" }}
+              >
+                {searchedWeatherData.name}
+              </h4>
+            </div>
+            <div>
+              <p className="card-text" style={{ fontSize: "1.5rem" }}>
+                Temperatura:{" "}
+                <span style={{ fontWeight: "bold" }}>
+                  {searchedWeatherData.temperature}°C
+                </span>
+              </p>
+              <p className="card-text" style={{ fontSize: "1.4rem" }}>
+                Condizioni Meteo:{" "}
+                <span
+                  style={{ fontWeight: "bold", textTransform: "uppercase" }}
+                >
+                  {searchedWeatherData.description}
+                </span>
+              </p>
+              <p className="card-text" style={{ fontSize: "1.4rem" }}>
+                Umidità:{" "}
+                <span style={{ fontWeight: "bold" }}>
+                  {searchedWeatherData.humidity}%
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {searchHistory.length > 0 && (
         <>
           <h3 className="mt-5">Cronologia delle ricerche:</h3>
@@ -288,9 +388,8 @@ const Weather = () => {
                   entry.name === currentSearch ? "border-primary" : "opacity-50"
                 }`}
                 style={{
-                  width: "28rem",
-                  minWidth: "24rem",
-                  maxWidth: "28rem",
+                  width: "250px",
+                  minWidth: "200px",
                   padding: "1.5rem",
                   background: entry.backgroundImage
                     ? `linear-gradient(rgba(0, 0, 0, 0), rgba(119, 125, 185, 0.55)), url(${entry.backgroundImage})`
@@ -303,42 +402,20 @@ const Weather = () => {
                     : "none",
                 }}
               >
-                <div className="card-body d-flex justify-content-between">
-                  <div
-                    className="d-flex flex-column align-items-start"
-                    style={{ marginRight: "20px" }}
-                  >
+                <div className="card-body">
+                  <div className="d-flex flex-column align-items-start">
                     <img
                       src={entry.iconUrl}
                       alt={entry.description}
-                      style={{ width: "50px", height: "50px" }} // Larger icon
+                      style={{
+                        width: "50px",
+                        height: "50px",
+                        marginBottom: "10px",
+                      }}
                     />
-                    <h2 className="card-title mt-2">{entry.name}</h2>
-                  </div>
-
-                  <div>
-                    <p className="card-text" style={{ fontSize: "1.2rem" }}>
-                      Temperatura:{" "}
-                      <span style={{ fontWeight: "bold" }}>
-                        {entry.temperature}°C
-                      </span>
-                    </p>
-                    <p className="card-text" style={{ fontSize: "1.2rem" }}>
-                      Condizioni Meteo:{" "}
-                      <span
-                        style={{
-                          fontWeight: "bold",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {entry.description}
-                      </span>
-                    </p>
-                    <p className="card-text" style={{ fontSize: "1.2rem" }}>
-                      Umidità:{" "}
-                      <span style={{ fontWeight: "bold" }}>
-                        {entry.humidity}%
-                      </span>
+                    <h6>{entry.name}</h6>
+                    <p>
+                      {entry.temperature}°C - {entry.description}
                     </p>
                   </div>
                 </div>
@@ -346,7 +423,7 @@ const Weather = () => {
             ))}
           </div>
         </>
-      )}{" "}
+      )}
     </div>
   );
 };
